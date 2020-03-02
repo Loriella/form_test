@@ -5,9 +5,85 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.wrapper {
+  margin: 0 auto;
+  max-width: 800px;
+}
+
+form {
+  background: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  max-width: 800px;
+}
+
+.invalid-feedback {
+  display: block;
+}
+
+.input-file {
+  width: 0;
+  height: 0;
+  opacity: 0;
+  position: absolute;
+  overflow: hidden;
+  z-index: -1;
+}
+
+.label-file {
+  color: #0055FB;
+  display: inline-block;
+  cursor: pointer;
+  padding-left: 5px;
+}
+
+.attachment {
+  border: 1px solid #ced4da;
+  margin-top: 5px;
+  padding: 5px 0;
+}
+
+.attachment:not(:first-child) {
+  margin-left: 10px;
+}
+
+.attachment-delete {
+  border: none;
+  background-color: #ffffff;
+  color:  #FF6666;
+  text-align: center;
+}
+
+table {
+  box-sizing: border-box;
+  max-width: 800px;
+}
+
+table thead {
+  border-bottom: 1px solid #dddddd;
+}
+
+table th {
+  color: #949494;
+  font-size: 16px;
+  font-weight: normal;
+}
+
+.cell-w {
+  min-width: 100px;
+}
+
+.text-over {
+  max-width: 450px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

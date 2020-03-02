@@ -1,5 +1,6 @@
 import React from "react";
 import Form from "./components/PageElements/Form";
+import SendMessages from "./components/PageElements/SendMessages";
 
 class App extends React.Component {
   constructor(props) {
@@ -80,14 +81,18 @@ class App extends React.Component {
   render() {
     return (
       <div className="container">
-        <form className="form p-4 mt-4 ">
-          <Form
-            values={this.state.values}
-            errors={this.state.errors}
-            onChange={this.onChange}
-            onSubmit={this.onSubmit}
-          />
-        </form>
+        <div className="wrapper">
+          <form className="form p-4 mt-4 ">
+            <Form
+              values={this.state.values}
+              errors={this.state.errors}
+              onChange={this.onChange}
+              onSubmit={this.onSubmit}
+            />
+          </form>
+
+          <SendMessages/>
+        </div>
       </div>
     )
   }
