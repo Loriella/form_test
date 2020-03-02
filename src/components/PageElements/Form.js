@@ -1,6 +1,7 @@
 import React from "react";
 import Field from "../FormElements/Field";
 import FieldFile from "../FormElements/FieldFile";
+import Attachment from "../FormElements/Attachment";
 
 const Form = props => {
   const {values, errors, onChange, onSubmit} = props;
@@ -10,7 +11,7 @@ const Form = props => {
       <h2>Отправлялка сообщений</h2>
       <div>
         <div className="form-row">
-          <div className="col-md-6 px-0 pt-2">
+          <div className="col-md-6 pr-0 pt-2">
             <Field
               id="from_name"
               labelText="От кого"
@@ -21,7 +22,7 @@ const Form = props => {
               error={errors.from_name}
             />
           </div>
-          <div className="col-md-6 px-0 pt-2">
+          <div className="col-md-6 pl-0 pt-2">
             <Field
               id="from_email"
               labelText="Email"
@@ -37,7 +38,7 @@ const Form = props => {
       </div>
       <div>
         <div className="form-row">
-          <div className="form-group col-md-6 px-0 pt-3">
+          <div className="form-group col-md-6 pr-0 pt-3">
             <Field
               id="to_name"
               labelText="Кому"
@@ -48,7 +49,7 @@ const Form = props => {
               error={errors.to_name}
             />
           </div>
-          <div className="form-group col-md-6 px-0 pt-3">
+          <div className="form-group col-md-6 pl-0 pt-3">
             <Field
               id="to_email"
               labelText="Email"
@@ -63,7 +64,7 @@ const Form = props => {
         </div>
       </div>
       <div className="form-row">
-        <div className="form-group col px-0">
+        <div className="form-group col">
           <Field
             id="email_subject"
             labelText="Тема письма"
@@ -75,7 +76,7 @@ const Form = props => {
         </div>
       </div>
       <div className="form-row">
-        <div className="form-group col px-0 mb-1">
+        <div className="form-group col mb-1">
           <label htmlFor="message">Сообщение</label>
           <textarea
             className="form-control"
@@ -87,8 +88,12 @@ const Form = props => {
           />
         </div>
       </div>
+        <div className="d-flex justify-content-between">
+          <Attachment/>
+          {/*<Attachment/>*/}
+        </div>
       <div className="form-row">
-        <div className="form-group col-md-6 px-0">
+        <div className="form-group col-md-6">
           <FieldFile/>
         </div>
       </div>
