@@ -18,11 +18,35 @@ code {
   max-width: 800px;
 }
 
-form {
+form,
+.sent-m {
   background: #ffffff;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   border-radius: 5px;
   max-width: 800px;
+}
+
+.sent-m-wrap {
+  padding: 100px 0;
+}
+
+.sent-m-wrap h3,
+.drop-modal h3 {
+  text-align: center;
+  padding: 0 30px;
+}
+
+.sent-m-wrap p,
+.drop-modal p {
+  text-align: center;
+  padding: 0 100px;
+}
+
+.drop-modal {
+  padding: 100px 0;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px dashed #cccccc;
+  border-radius: 5px;
 }
 
 .invalid-feedback {

@@ -8,7 +8,7 @@ const Form = props => {
 
   return (
     <div>
-      <h2>Отправлялка сообщений</h2>
+      <h3>Отправлялка сообщений</h3>
       <div>
         <div className="form-row">
           <div className="col-md-6 pr-0 pt-2">

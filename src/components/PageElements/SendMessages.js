@@ -3,7 +3,7 @@ import React from "react";
 const SendMessages = () => {
   return (
     <div className="pt-4">
-      <h2>Отправленные сообщения</h2>
+      <h3 className="pl-1">Отправленные сообщения</h3>
       <table className="table table-sm table-borderless">
         <thead>
         <tr>
