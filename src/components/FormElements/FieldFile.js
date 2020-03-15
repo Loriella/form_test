@@ -1,18 +1,47 @@
 import React from "react";
 import clip from "./img/clip.png";
+import classNames from "classnames";
+import {MAX_FILE_SIZE} from "../PageElements/Form";
 
-const FieldFile = () => {
+const FieldFile = props => {
+  const {onChange, onFileError, name, error} = props;
+
+  const onChangeFile = event => {
+    const file = event.target.files[0];
+
+    if (file.size > MAX_FILE_SIZE) {
+      onFileError("Слишком большой файл");
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = ev => {
+      onChange({
+        target: {
+          name: name,
+          value: ev.target.result,
+          size: file.size,
+          file_name: file.name
+        },
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+
   return (
     <div className="form-group">
       <img src={clip} alt="clip"/>
       <label htmlFor="file" className="label-file">Прикрепить файл</label>
       <input
-        className="input-file"
-        id="file"
-        name="file"
+        className={classNames("input-file", {"is-invalid": error})}
+        id={name}
+        name={name}
         type="file"
-        multiple
+        onChange={onChangeFile}
+        accept=".jpg,.png,.gif,.doc,.xls,.pdf,.zip"
       />
+      {error && <div className="invalid-feedback">{error}</div>}
     </div>
   )
 };
