@@ -1,16 +1,16 @@
 import React from "react";
-import clip from "./img/clip.png";
+import clip from "../img/clip.png";
 import classNames from "classnames";
-import {MAX_FILE_SIZE} from "../PageElements/Form";
+import {MAX_FILE_SIZE} from "../Form";
 
 const FieldFile = props => {
-  const {onChange, onFileError, name, error} = props;
+  const {onChange, updateFileError, name, error} = props;
 
   const onChangeFile = event => {
     const file = event.target.files[0];
 
     if (file.size > MAX_FILE_SIZE) {
-      onFileError("Слишком большой файл");
+      updateFileError("Слишком большой файл");
       return;
     }
 
@@ -32,7 +32,7 @@ const FieldFile = props => {
   return (
     <div className="form-group">
       <img src={clip} alt="clip"/>
-      <label htmlFor="file" className="label-file">Прикрепить файл</label>
+      <label htmlFor="attaches" className="label-file">Прикрепить файл</label>
       <input
         className={classNames("input-file", {"is-invalid": error})}
         id={name}

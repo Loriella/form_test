@@ -1,11 +1,11 @@
 import * as types from "./mail.types"
-import {getMailStatus, sendMail} from "../../api/api";
+import {sendMail} from "../../api/api";
 
 export const sendingMessage = (toEmail, letter) => dispatch => {
   dispatch({
     type: types.SEND_MESSAGE_REQUEST
   });
-  sendMail(toEmail, letter)
+  return sendMail(toEmail, letter)
     .then((res) => {
       dispatch({
         type: types.SEND_MESSAGE_SUCCESS,
@@ -17,8 +17,7 @@ export const sendingMessage = (toEmail, letter) => dispatch => {
           date: new Date()
         }
       });
-      dispatch(messageSent());
-
+      dispatch(showSentMessageAlert());
     })
     .catch(error => {
       dispatch({
@@ -33,7 +32,7 @@ export const sendingMessage = (toEmail, letter) => dispatch => {
     })
 };
 
-const messageSent = () => dispatch => {
+const showSentMessageAlert = () => dispatch => {
   dispatch({
     type: types.SET_SENT
   });
@@ -50,16 +49,4 @@ export const updateStatus = (id, status) => dispatch => {
     id,
     status
   })
-};
-
-export const updateStatuses = (mailsList) => dispatch => {
-  const mailsForGetStatus = mailsList.filter(mail => +mail.status > -1);
-
-  mailsForGetStatus.forEach(mail => getMailStatus(mail.track_id)
-    .then(i => {
-      console.log(i);
-      const {obj} = i;
-      const {id, status} = obj;
-      dispatch(updateStatus(id, status))
-    }));
 };

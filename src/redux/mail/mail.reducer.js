@@ -3,7 +3,7 @@ import * as types from "./mail.types";
 const initialState = {
   mails: [],
   sending: false,
-  sent: false
+  send_mail: false
 };
 
 const mailReducer = (state = initialState, action) => {
@@ -26,13 +26,13 @@ const mailReducer = (state = initialState, action) => {
     case types.SET_SENT:
       return {
         ...state,
-        sent: true
+        send_mail: true
       };
 
     case types.UNSET_SENT:
       return {
         ...state,
-        sent: false
+        send_mail: false
       };
 
     case types.UPDATE_STATUS:

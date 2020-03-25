@@ -1,11 +1,11 @@
 import React from "react";
-import Field from "../FormElements/Field";
-import FieldFile from "../FormElements/FieldFile";
-import Attachment from "../FormElements/Attachment";
+import Field from "./FormElements/Field";
+import FieldFile from "./FormElements/FieldFile";
+import Attachment from "./FormElements/Attachment";
 import {connect} from "react-redux";
 import {sendingMessage} from "../../redux/mail/mail.actions";
-import FieldTextarea from "./FieldTextarea";
-import DropModal from "./DropModal";
+import FieldTextarea from "./FormElements/FieldTextarea";
+import DropModal from "./FormElements/DropModal";
 
 const MAX_FILES_SIZE = 20971520;
 export const MAX_FILE_SIZE = 5242880;
@@ -18,10 +18,10 @@ const initialFormState = {
     to_email: "",
     email_subject: "",
     message: "",
-    file: []
+    attaches: []
   },
   errors: {},
-  drag: false
+  show_drop_modal: false
 };
 
 class Form extends React.Component {
@@ -37,78 +37,108 @@ class Form extends React.Component {
 
     const errors = {};
     const regexForEmail = /^([\w.%+-]+)@([\w-]+\.)+([\w]{2,})$/i;
+    const {
+      values: {
+        from_name,
+        from_email,
+        to_name,
+        to_email,
+        email_subject,
+        message,
+        attaches
+      }
+    } = this.state;
 
-
-    if (this.state.values.from_name.length === 0) {
+    if (from_name.length === 0) {
       errors.from_name = "Введите имя отправителя"
     }
 
-    if (!regexForEmail.test(this.state.values.from_email)) {
+    if (!regexForEmail.test(from_email)) {
       errors.from_email = "Введен неверный email";
     }
 
-    if (this.state.values.to_name.length === 0) {
+    if (to_name.length === 0) {
       errors.to_name = "Введите имя получателя"
     }
 
-    if (!regexForEmail.test(this.state.values.to_email)) {
+    if (!regexForEmail.test(to_email)) {
       errors.to_email = "Введен неверный email";
     }
 
-    if (this.state.values.email_subject.length === 0) {
+    if (email_subject.length === 0) {
       errors.email_subject = "Введите тему письма"
     }
 
-    if (this.state.values.message.length === 0) {
+    if (message.length === 0) {
       errors.message = "Введите сообщение"
     }
 
-    const sumSizesFiles = this.state.values.file.reduce((acc, file) => {
-      return file.size + acc
-    }, 0);
+    const sumSizesFiles = attaches.reduce((acc, file) => file.size + acc, 0);
 
-    if(sumSizesFiles > MAX_FILES_SIZE) {
-      errors.file = "Суммарный размер файлов превышает 20 МБ"
+    if (sumSizesFiles > MAX_FILES_SIZE) {
+      errors.attaches = "Суммарный размер файлов превышает 20 МБ"
     }
 
-
     return errors;
+  };
+
+  normalizeValue = ({name, value, file_name, size}, values) => {
+    switch (name) {
+      case "attaches":
+        return [
+          ...values.attaches, {
+            file_name,
+            size,
+            value
+          }];
+
+      default:
+        return value
+    }
   };
 
   onChange = event => {
     const {name, value, file_name, size} = event.target;
 
-    this.setState(state => {
-      let newFile;
-      if (name === "file") {
-        newFile = [
-          ...state.values.file, {
-            file_name,
-            size,
-            value
-          }];
-      }
-      return ({
-        values: {
-          ...state.values,
-          [name]: newFile || value
-        },
+    this.setState(state => ({
+     values: {
+       ...state.values,
+       [name]: this.normalizeValue({name, value, file_name, size}, state.values)
+     },
         errors: {
           ...state.errors,
           [name]: false,
         },
-      });
-    })
+    }))
   };
 
   onDelete = index => {
-    const newFiles = this.state.values.file.filter((f, i) => i !== index);
+    const newFiles = this.state.values.attaches.filter((_, indexFile) => indexFile !== index);
     this.setState({
       values: {
         ...this.state.values,
-        file: newFiles
+        attaches: newFiles
       }
     })
+  };
+
+  prepareLetterForServer = (values) => {
+    const {email_subject, from_name, from_email, to_name, message, attaches} = values;
+
+    return {
+      "subject": email_subject,
+      "from.name": from_name,
+      "from.email": from_email,
+      "to.name": to_name,
+      "message": {"text": message},
+      "attaches": attaches.map((file) => (
+        {
+          "name": file.file_name,
+          "content": file.value,
+          "encoding": "base64",
+        }
+      ))
+    }
   };
 
   onSubmit = event => {
@@ -120,51 +150,39 @@ class Form extends React.Component {
         errors,
       })
     } else {
-      const letter = {
-        "subject": this.state.values.email_subject,
-        "from.name": this.state.values.from_name,
-        "from.email": this.state.values.from_email,
-        "to.name": this.state.values.to_name,
-        "message": {"text": this.state.values.message},
-        "attaches": this.state.values.file.map((file) => (
-          {
-            "name": file.file_name,
-            "content": file.value,
-            "encoding": "base64",
-          }
-        ))
-      };
+      const letter = this.prepareLetterForServer(this.state.values);
 
-      this.props.sendingMessage(this.state.values.to_email, letter);
-      this.setState({
-        ...initialFormState,
-      });
+      this.props.sendingMessage(this.state.values.to_email, letter)
+        // .then(() => {
+        //   this.setState({
+        //     ...initialFormState,
+        //   });
+        // });
     }
   };
 
   showDropZone = () => {
     this.setState({
-      drag: true
+      show_drop_modal: true
     })
   };
 
   hideDropZone = () => {
     this.setState({
-      drag: false
+      show_drop_modal: false
     })
   };
 
   onDrop = event => {
-    console.log("OnDrop");
     event.preventDefault();
     this.setState({
-      drag: false
+      show_drop_modal: false
     });
     const file = event.dataTransfer.files[0];
 
     if (file.size > MAX_FILE_SIZE) {
-      this.onFileError("Слишком большой файл");
-      return;
+      this.updateFileError("Слишком большой файл");
+      return "invalid";
     }
 
     const reader = new FileReader();
@@ -172,7 +190,7 @@ class Form extends React.Component {
     reader.onload = ev => {
       this.onChange({
         target: {
-          name: "file",
+          name: "attaches",
           value: ev.target.result,
           size: file.size,
           file_name: file.name
@@ -183,18 +201,17 @@ class Form extends React.Component {
 
   };
 
-  onFileError = (errorMessage) => {
+  updateFileError = (errorMessage) => {
     this.setState(state => ({
       errors: {
         ...state.errors,
-        file: errorMessage
+        attaches: errorMessage
       }
     }))
   };
 
   render() {
     const {values, errors} = this.state;
-    const {onChange, onSubmit, onDelete, onDrop, hideDropZone, onFileError} = this;
 
     return (
       <div className="position-relative">
@@ -213,7 +230,7 @@ class Form extends React.Component {
                   placeholder="Имя"
                   name="from_name"
                   value={values.from_name}
-                  onChange={onChange}
+                  onChange={this.onChange}
                   error={errors.from_name}
                 />
               </div>
@@ -225,7 +242,7 @@ class Form extends React.Component {
                   name="from_email"
                   type="email"
                   value={values.from_email}
-                  onChange={onChange}
+                  onChange={this.onChange}
                   error={errors.from_email}
                 />
               </div>
@@ -240,7 +257,7 @@ class Form extends React.Component {
                   placeholder="Имя"
                   name="to_name"
                   value={values.to_name}
-                  onChange={onChange}
+                  onChange={this.onChange}
                   error={errors.to_name}
                 />
               </div>
@@ -252,7 +269,7 @@ class Form extends React.Component {
                   name="to_email"
                   type="email"
                   value={values.to_email}
-                  onChange={onChange}
+                  onChange={this.onChange}
                   error={errors.to_email}
                 />
               </div>
@@ -266,7 +283,7 @@ class Form extends React.Component {
                 placeholder="Тема письма"
                 name="email_subject"
                 value={values.email_subject}
-                onChange={onChange}
+                onChange={this.onChange}
                 error={errors.email_subject}
               />
             </div>
@@ -278,19 +295,19 @@ class Form extends React.Component {
               name="message"
               rows="6"
               value={values.message}
-              onChange={onChange}
+              onChange={this.onChange}
               error={errors.message}
             />
           </div>
           <div className="">
             <div className="row">
               {
-                values.file.map((file, index) => (
+                values.attaches.map((file, index) => (
                   <Attachment
                     key={index}
                     file_name={file.file_name}
                     index={index}
-                    onDelete={onDelete}
+                    onDelete={this.onDelete}
                   />
 
                 ))
@@ -300,34 +317,39 @@ class Form extends React.Component {
           <div className="form-row">
             <div className="form-group col-md-6">
               <FieldFile
-                onChange={onChange}
-                onFileError={onFileError}
-                name="file"
-                error={errors.file}
+                onChange={this.onChange}
+                updateFileError={this.updateFileError}
+                name="attaches"
+                error={errors.attaches}
               />
             </div>
           </div>
           <button
             type="submit"
             className="btn btn-primary w-25"
-            onClick={onSubmit}
+            onClick={this.onSubmit}
+            disabled={this.props.sending}
           >
             Отправить
           </button>
         </form>
-        {this.state.drag &&
-          <DropModal
-            onDragLeave={hideDropZone}
-            onDrop={onDrop}
-          />
+        {this.state.show_drop_modal &&
+        <DropModal
+          onDragLeave={this.hideDropZone}
+          onDrop={this.onDrop}
+        />
         }
       </div>
     )
   }
 }
 
-const mapDispatchToProps = dispatch => ({
-  sendingMessage: (toEmail, letter) => dispatch(sendingMessage(toEmail, letter))
-});
+const mapDispatchToProps = {sendingMessage};
+const mapStateToProps = state => {
+  return {
+    sending: state.sending
+  }
+};
 
-export default connect(null, mapDispatchToProps)(Form);
+
+export default connect(mapStateToProps, mapDispatchToProps)(Form);

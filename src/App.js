@@ -1,16 +1,16 @@
 import React from "react";
-import SendMessages from "./components/PageElements/SendMessages";
-import SentMessage from "./components/PageElements/SentMessage";
-import Form from "./components/PageElements/Form";
+import SendMessages from "./components/Messages/SendMessages";
+import SentMessage from "./components/SendMail/SendMail";
+import Form from "./components/Form/Form";
 import {connect} from "react-redux";
 
-const App = ({sent}) => (
+const App = ({send_mail}) => (
   <div className="container">
     <div className="wrapper">
       {
-        !sent
-          ? <Form/>
-          : <SentMessage/>
+        send_mail
+          ? <SentMessage/>
+          : <Form/>
       }
       <SendMessages/>
     </div>
@@ -19,7 +19,7 @@ const App = ({sent}) => (
 
 const mapStateToProps = state => {
   return {
-    sent: state.mail.sent
+    send_mail: state.mail.send_mail
   }
 };
 
