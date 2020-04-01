@@ -1,6 +1,6 @@
 import React from "react";
-import clipLarge from "../img/clip-large.png";
-import trash from "../img/trash.png";
+import clipLarge from "../../../assets/images/clip-large.png";
+import trash from "../../../assets/images/trash.png";
 
 const Attachment = ({file_name, onDelete, index}) => (
   <div className="col-md-6">

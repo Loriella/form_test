@@ -1,5 +1,5 @@
 import React from "react";
-import clip from "../img/clip.png";
+import clip from "../../../assets/images/clip.png";
 import classNames from "classnames";
 import {MAX_FILE_SIZE} from "../Form";
 

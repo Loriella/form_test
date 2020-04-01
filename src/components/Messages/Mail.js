@@ -4,15 +4,30 @@ import {getMailStatus} from "../../api/api";
 import {updateStatus} from "../../redux/mail/mail.actions";
 import {connect} from "react-redux";
 
-const getStatus = (status) => {
-  const statusNumber = +status;
+const EMAIL_STATUS_SENT = -1;
 
-  if (statusNumber === -1) {
-    return <span className="text-success">Отправлено</span>
-  } else if (statusNumber > -1) {
-    return <span className="text-muted">В очереди</span>
+const getStatus = status => {
+  const statusNumber = Number(status);
+
+  if (statusNumber === EMAIL_STATUS_SENT) {
+    return "sent"
+  } else if (statusNumber > EMAIL_STATUS_SENT) {
+    return "in_queue"
   }
-  return <span className="text-danger">Ошибка</span>;
+  return "error";
+};
+
+const getMessage = status => {
+  let message = getStatus(status);
+
+  switch (message) {
+    case "sent":
+      return <span className="text-success">Отправлено</span>;
+    case "in_queue":
+      return <span className="text-muted">В очереди</span>;
+    default:
+      return <span className="text-danger">Ошибка</span>;
+  }
 };
 
 class Mail extends React.Component {
@@ -28,12 +43,11 @@ class Mail extends React.Component {
 
   checkStatus = () => {
     getMailStatus(this.props.mail.track_id)
-      .then(res => {
-        const {obj} = res;
-        const {id, status} = obj;
+      .then(response => {
+        const {obj: {id, status}} = response;
         this.props.updateStatus(id, status);
 
-        if(+status > -1) {
+        if (Number(status) > -1) {
           this.idTimeout = setTimeout(() => {
             this.checkStatus()
           }, 3000);
@@ -48,7 +62,7 @@ class Mail extends React.Component {
       <tr>
         <td className="cell-w">{dayjs(mail.date).locale("ru").format("DD MMMM")}</td>
         <td colSpan="2" className="text-over">{mail.subject}</td>
-        <td className="text-right">{getStatus(mail.status)}</td>
+        <td className="text-right">{getMessage(mail.status)}</td>
       </tr>
     );
   }

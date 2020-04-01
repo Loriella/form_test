@@ -153,11 +153,6 @@ class Form extends React.Component {
       const letter = this.prepareLetterForServer(this.state.values);
 
       this.props.sendingMessage(this.state.values.to_email, letter)
-        // .then(() => {
-        //   this.setState({
-        //     ...initialFormState,
-        //   });
-        // });
     }
   };
 
